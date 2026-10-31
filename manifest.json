@@ -1,0 +1,25 @@
+{
+  "name": "ALYZ SPOTIFY",
+  "short_name": "ALYZ",
+  "description": "ALYZ SPOTIFY - NEUBRUTALISM PLAYER",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#F5F5F5",
+  "theme_color": "#000000",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://files.catbox.moe/an7370.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://files.catbox.moe/an7370.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    }
+  ]
+}
