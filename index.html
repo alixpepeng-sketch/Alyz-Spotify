@@ -69,7 +69,7 @@
     }
     .nav-item{flex:1;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:bold;border-radius:16px;cursor:pointer;background:transparent;border:2px solid transparent;transition:all 0.4s}
     .nav-item.active{background:var(--black);color:var(--white);border:2px solid var(--black)}
-    #floating-disc{position:fixed;top:140px;left:16px;width:80px;height:80px;background:var(--white);border:var(--border);box-shadow:5px 5px 0px var(--black);border-radius:50%;z-index:20;display:flex;align-items:center;justify-content:center;cursor:pointer;pointer-events:auto;}
+    #floating-disc{position:fixed;top:140px;left:16px;width:80px;height:80px;background:var(--white);border:var(--border);box-shadow:5px 5px 0px var(--black);border-radius:50%;z-index:20;display:flex;align-items:center;justify-content:center;cursor:grab;touch-action:none;pointer-events:auto;}
     .disc-inner-cover{width:60px;height:60px;border-radius:50%;border:var(--border);object-fit:cover;background:var(--gray)}
     .spin-anim{animation:spin 3s linear infinite;animation-play-state:paused}
     .spin-anim.playing{animation-play-state:running}
@@ -79,7 +79,6 @@
   </style>
 </head>
 <body oncontextmenu="return false">
-
   <div id="intro-screen">
     <div class="fingerprint-container" id="hold-area">
       <img src="https://files.catbox.moe/fyeswy.jpeg" class="fingerprint-img" alt="fingerprint" draggable="false">
@@ -87,7 +86,6 @@
     <div class="progress-bar-container"><div id="progress-line"></div></div>
     <div id="progress-text">0%</div>
   </div>
-
   <div id="app-screen">
     <div class="content-area">
       <div id="view-home" class="view active">
@@ -115,9 +113,7 @@
       <div id="disc-dot" class="disc-dot"></div>
     </div>
   </div>
-
   <audio id="audio-player" playsinline preload="auto" autoplay></audio>
-
   <script>
     const SONGS = [
       { id: 1, title: "Iqro'", artist: "Raim Laode", genre: "INDIE", cover: "https://files.catbox.moe/z0nc0b.jpeg", audio: "https://files.catbox.moe/6av5la.mp3", link: "https://open.spotify.com/search/Iqro%20Raim%20Laode" },
@@ -187,14 +183,48 @@
     }
     audioPlayer.onplay=()=>{ discCover.classList.add('playing'); discDot.classList.add('playing'); renderHome(); renderPlaylist(); if('mediaSession' in navigator) navigator.mediaSession.playbackState='playing'; };
     audioPlayer.onpause=()=>{ discCover.classList.remove('playing'); discDot.classList.remove('playing'); renderHome(); renderPlaylist(); if('mediaSession' in navigator) navigator.mediaSession.playbackState='paused'; };
-    audioPlayer.onended=()=>{ 
-      let idx=SONGS.findIndex(s=>s.id===currentSongId); 
-      idx=(idx+1)%SONGS.length; 
-      setTimeout(()=>playSong(SONGS[idx].id), 500);
-    };
+    audioPlayer.onended=()=>{ let idx=SONGS.findIndex(s=>s.id===currentSongId); idx=(idx+1)%SONGS.length; setTimeout(()=>playSong(SONGS[idx].id), 500); };
 
-    // FLOATING CUKUP DI PENCET AJA - ON/OFF (TANPA DRAG)
-    floatingDisc.addEventListener('click', togglePlayPause);
+    // === FLOATING BISA GESER + PENCET ON/OFF ===
+    let dragMoved=false, startX, startY, startLeft, startTop;
+    function getPointerEvent(e){ return e.type.includes('touch') ? e.touches[0] : e; }
+    floatingDisc.addEventListener('mousedown', dragStart); 
+    floatingDisc.addEventListener('touchstart', dragStart, {passive:false});
+    function dragStart(e){ 
+      const evt=getPointerEvent(e); 
+      startX=evt.clientX; startY=evt.clientY; 
+      const style=window.getComputedStyle(floatingDisc); 
+      startLeft=parseInt(style.left,10); 
+      startTop=parseInt(style.top,10); 
+      dragMoved=false; 
+      document.addEventListener('mousemove', dragMove); 
+      document.addEventListener('mouseup', dragEnd); 
+      document.addEventListener('touchmove', dragMove, {passive:false}); 
+      document.addEventListener('touchend', dragEnd); 
+    }
+    function dragMove(e){ 
+      const evt=getPointerEvent(e); 
+      const dx=evt.clientX-startX; 
+      const dy=evt.clientY-startY; 
+      if(Math.abs(dx)>5 || Math.abs(dy)>5){ dragMoved=true; e.preventDefault(); } 
+      if(dragMoved){ 
+        let newLeft=startLeft+dx; 
+        let newTop=startTop+dy; 
+        const maxLeft=window.innerWidth-80-10; 
+        const maxTop=window.innerHeight-80-100; 
+        newLeft=Math.max(10,Math.min(newLeft,maxLeft)); 
+        newTop=Math.max(10,Math.min(newTop,maxTop)); 
+        floatingDisc.style.left=newLeft+'px'; 
+        floatingDisc.style.top=newTop+'px'; 
+      } 
+    }
+    function dragEnd(){ 
+      document.removeEventListener('mousemove', dragMove); 
+      document.removeEventListener('mouseup', dragEnd); 
+      document.removeEventListener('touchmove', dragMove); 
+      document.removeEventListener('touchend', dragEnd); 
+      if(!dragMoved){ togglePlayPause(); } 
+    }
 
     init();
   </script>
