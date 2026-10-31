@@ -22,15 +22,15 @@
     body{background-color:var(--bg);color:var(--black);overflow:hidden;height:100vh;height:100dvh;width:100vw;background-image:linear-gradient(var(--gray) 1px, transparent 1px),linear-gradient(90deg, var(--gray) 1px, transparent 1px);background-size:20px 20px}
     #intro-screen{position:fixed;top:0;left:0;width:100%;height:100%;background:var(--bg);background-image:linear-gradient(var(--gray) 1px, transparent 1px),linear-gradient(90deg, var(--gray) 1px, transparent 1px);background-size:20px 20px;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 0.6s cubic-bezier(0.16,1,0.3,1),transform 0.6s cubic-bezier(0.16,1,0.3,1)}
     #intro-screen.hide{opacity:0;transform:scale(1.1);pointer-events:none}
-    .fingerprint-container{position:relative;width:120px;height:120px;border:var(--border);box-shadow:var(--shadow);border-radius:50%;background:var(--white);display:flex;align-items:center;justify-content:center;cursor:pointer;margin-bottom:40px;transition:transform 0.2s;overflow:hidden}
+    /* GEDEIN DISINI */
+    .fingerprint-container{position:relative;width:200px;height:200px;border:var(--border);box-shadow:var(--shadow);border-radius:50%;background:var(--white);display:flex;align-items:center;justify-content:center;cursor:pointer;margin-bottom:40px;transition:transform 0.2s;overflow:hidden}
     .fingerprint-container:active{transform:scale(0.95);box-shadow:2px 2px 0px var(--black)}
-    .fingerprint-img{width:70px;height:70px;object-fit:contain}
+    .fingerprint-img{width:150px;height:150px;object-fit:contain}
     .progress-bar-container{width:80%;max-width:300px;height:14px;border:var(--border);border-radius:14px;background:var(--white);position:relative;margin-bottom:20px;overflow:hidden;box-shadow:4px 4px 0px var(--black)}
     #progress-line{position:absolute;top:0;left:50%;height:100%;width:0%;background:var(--black);transform:translateX(-50%);transition:width 0.1s linear}
     #progress-text{font-size:28px;font-weight:900}
     #app-screen{display:none;height:100%;width:100%;position:relative;opacity:0;transform:translateY(20px);transition:opacity 0.6s,transform 0.6s}
     #app-screen.show{opacity:1;transform:translateY(0)}
-    /* FIX UTAMA DISINI */
     .content-area{height:100vh;height:100dvh;overflow-y:auto;padding:16px 16px 170px 16px}
     .view{display:none;animation:fadeSlideUp 0.4s cubic-bezier(0.16,1,0.3,1) forwards}
     .view.active{display:block}
@@ -57,7 +57,6 @@
     .profile-detail{font-size:12px;padding:12px 20px;border:var(--border);background:var(--white);box-shadow:4px 4px 0px var(--black);border-radius:var(--radius);width:100%}
     .btn-logout{width:100%;padding:16px;font-size:14px;background:var(--black);color:var(--white);border:var(--border);box-shadow:var(--shadow);border-radius:var(--radius);cursor:pointer;margin-top:10px}
     .api-guide{font-size:10px;text-transform:none;padding:12px;border:2px solid var(--black);background:#FFE082;border-radius:var(--radius);text-align:left;width:100%;box-shadow:4px 4px 0px var(--black)}
-    /* FIX NAV KETUTUP */
     .bottom-nav{
       position:fixed;
       bottom: calc(12px + env(safe-area-inset-bottom));
@@ -87,7 +86,6 @@
   </style>
 </head>
 <body>
-
   <div id="intro-screen">
     <div class="fingerprint-container" id="hold-area">
       <img src="https://files.catbox.moe/fyeswy.jpeg" class="fingerprint-img" alt="fingerprint">
@@ -95,7 +93,6 @@
     <div class="progress-bar-container"><div id="progress-line"></div></div>
     <div id="progress-text">0%</div>
   </div>
-
   <div id="app-screen">
     <div class="content-area">
       <div id="view-home" class="view active">
@@ -123,9 +120,7 @@
       <div id="disc-dot" class="disc-dot"></div>
     </div>
   </div>
-
   <audio id="audio-player" playsinline preload="auto"></audio>
-
   <script>
     const SONGS = [
       { id: 1, title: "Iqro'", artist: "Raim Laode", genre: "INDIE", cover: "https://files.catbox.moe/z0nc0b.jpeg", audio: "https://files.catbox.moe/6av5la.mp3", link: "https://open.spotify.com/search/Iqro%20Raim%20Laode" },
