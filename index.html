@@ -3,7 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>ALYZ SPOTIFY - NEUBRUTALISM</title>
+  <title>ALYZ SPOTIFY</title>
+  
+  <!-- PWA WAJIB -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#000000">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" href="/icon-192.png">
+
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
   <style>
     :root { --bg:#F5F5F5; --black:#000; --white:#fff; --gray:#E5E5E5; --dot-green:#00FF00; --dot-red:#FF0000; --tick-blue:#1DA1F2; --border:3px solid var(--black); --shadow:6px 6px 0px var(--black); --radius:14px; }
@@ -147,8 +155,6 @@
     audioPlayer.onplay=()=>{ discCover.classList.add('playing'); discDot.classList.add('playing'); renderHome(); renderPlaylist(); if('mediaSession' in navigator) navigator.mediaSession.playbackState='playing'; };
     audioPlayer.onpause=()=>{ discCover.classList.remove('playing'); discDot.classList.remove('playing'); renderHome(); renderPlaylist(); if('mediaSession' in navigator) navigator.mediaSession.playbackState='paused'; };
     audioPlayer.onended=()=>{ let idx=SONGS.findIndex(s=>s.id===currentSongId); idx=(idx+1)%SONGS.length; setTimeout(()=>playSong(SONGS[idx].id), 500); };
-
-    // === FIX FINAL - PENCET = ON/OFF, GESER = PINDAH ===
     let isDragging = false, startX, startY, startLeft, startTop;
     floatingDisc.addEventListener('pointerdown', (e) => {
       isDragging = false;
@@ -174,13 +180,19 @@
     });
     floatingDisc.addEventListener('pointerup', (e) => {
       try{ floatingDisc.releasePointerCapture(e.pointerId); }catch(_){}
-      if (!isDragging) {
-        togglePlayPause();
-      }
+      if (!isDragging) { togglePlayPause(); }
       setTimeout(()=>{ isDragging=false; }, 100);
     });
-
     init();
+
+    // === PWA REGISTER - INI YANG KEMARIN KURANG ===
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then(reg => console.log('SW registered:', reg.scope))
+          .catch(err => console.log('SW failed:', err));
+      });
+    }
   </script>
 </body>
 </html>
