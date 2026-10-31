@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ALYZ SPOTIFY - NEUBRUTALISM</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #F5F5F5;
+      --black: #000000;
+      --white: #FFFFFF;
+      --gray: #E5E5E5;
+      --dot-green: #00FF00;
+      --dot-red: #FF0000;
+      --tick-blue: #1DA1F2;
+      --border: 3px solid var(--black);
+      --shadow: 6px 6px 0px var(--black);
+      --radius: 14px;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;font-family:'Space Grotesk',sans-serif;text-transform:uppercase;-webkit-tap-highlight-color:transparent;user-select:none}
+    body{background-color:var(--bg);color:var(--black);overflow:hidden;height:100vh;width:100vw;background-image:linear-gradient(var(--gray) 1px, transparent 1px),linear-gradient(90deg, var(--gray) 1px, transparent 1px);background-size:20px 20px}
+    #intro-screen{position:fixed;top:0;left:0;width:100%;height:100%;background:var(--bg);background-image:linear-gradient(var(--gray) 1px, transparent 1px),linear-gradient(90deg, var(--gray) 1px, transparent 1px);background-size:20px 20px;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 0.6s cubic-bezier(0.16,1,0.3,1),transform 0.6s cubic-bezier(0.16,1,0.3,1)}
+    #intro-screen.hide{opacity:0;transform:scale(1.1);pointer-events:none}
+    .fingerprint-container{position:relative;width:120px;height:120px;border:var(--border);box-shadow:var(--shadow);border-radius:50%;background:var(--white);display:flex;align-items:center;justify-content:center;cursor:pointer;margin-bottom:40px;transition:transform 0.2s;overflow:hidden}
+    .fingerprint-container:active{transform:scale(0.95);box-shadow:2px 2px 0px var(--black)}
+    .fingerprint-img{width:70px;height:70px;object-fit:contain}
+    .progress-bar-container{width:80%;max-width:300px;height:14px;border:var(--border);border-radius:14px;background:var(--white);position:relative;margin-bottom:20px;overflow:hidden;box-shadow:4px 4px 0px var(--black)}
+    #progress-line{position:absolute;top:0;left:50%;height:100%;width:0%;background:var(--black);transform:translateX(-50%);transition:width 0.1s linear}
+    #progress-text{font-size:28px;font-weight:900}
+    #app-screen{display:none;height:100%;width:100%;position:relative;opacity:0;transform:translateY(20px);transition:opacity 0.6s,transform 0.6s}
+    #app-screen.show{opacity:1;transform:translateY(0)}
+    .content-area{height:100vh;overflow-y:auto;padding:0 0 120px 0}
+    .view{display:none;padding:16px;animation:fadeSlideUp 0.4s cubic-bezier(0.16,1,0.3,1) forwards}
+    .view.active{display:block}
+    @keyframes fadeSlideUp{from{opacity:0;transform:translateY(15px)}to{opacity:1;transform:translateY(0)}}
+    .search-bar{width:100%;padding:14px;font-size:14px;font-weight:bold;border:var(--border);box-shadow:var(--shadow);border-radius:var(--radius);outline:none;background:var(--white);margin-bottom:12px}
+    .genres-wrapper{display:flex;gap:12px;padding-bottom:16px;overflow-x:auto;scrollbar-width:none}
+    .genres-wrapper::-webkit-scrollbar{display:none}
+    .genre-chip{padding:8px 16px;border:var(--border);box-shadow:4px 4px 0px var(--black);border-radius:20px;background:var(--white);font-size:12px;cursor:pointer;white-space:nowrap;transition:all 0.2s}
+    .genre-chip.active{background:var(--black);color:var(--white);box-shadow:0px 0px 0px var(--black);transform:translate(4px,4px)}
+    .song-card{display:flex;align-items:center;padding:10px;border:var(--border);box-shadow:var(--shadow);border-radius:var(--radius);background:var(--white);margin-bottom:16px;cursor:pointer;gap:12px;transition:transform 0.2s}
+    .song-card:active{transform:scale(0.98) translate(2px,2px);box-shadow:2px 2px 0px var(--black)}
+    .song-card.playing-active{background:var(--black);color:var(--white)}
+    .song-cover{width:56px;height:56px;border:var(--border);border-radius:8px;object-fit:cover;background:var(--gray)}
+    .song-info{flex:1;display:flex;flex-direction:column;gap:4px;overflow:hidden}
+    .song-title{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .song-artist{font-size:10px;opacity:0.8}
+    .badge{font-size:10px;padding:2px 6px;border:2px solid var(--black);border-radius:6px;background:var(--gray);color:var(--black)}
+    .btn-open{padding:8px 14px;border:2px solid var(--black);background:var(--white);color:var(--black);font-size:10px;border-radius:8px;box-shadow:2px 2px 0px var(--black);text-decoration:none}
+    #view-setting{flex-direction:column;align-items:center;gap:20px;text-align:center;padding-top:30px}
+    #view-setting.active{display:flex}
+    .profile-img{width:110px;height:110px;border-radius:50%;border:var(--border);box-shadow:var(--shadow);object-fit:cover;background:var(--gray)}
+    .profile-name{font-size:22px;display:flex;align-items:center;justify-content:center;gap:8px}
+    .verified-tick{width:20px;height:20px;background:var(--tick-blue);color:var(--white);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;border:2px solid var(--black)}
+    .profile-detail{font-size:12px;padding:12px 20px;border:var(--border);background:var(--white);box-shadow:4px 4px 0px var(--black);border-radius:var(--radius);width:100%}
+    .btn-logout{width:100%;padding:16px;font-size:14px;background:var(--black);color:var(--white);border:var(--border);box-shadow:var(--shadow);border-radius:var(--radius);cursor:pointer;margin-top:10px}
+    .api-guide{font-size:10px;text-transform:none;padding:12px;border:2px solid var(--black);background:#FFE082;border-radius:var(--radius);text-align:left;width:100%;box-shadow:4px 4px 0px var(--black)}
+    .bottom-nav{position:fixed;bottom:20px;left:16px;width:calc(100% - 32px);height:70px;background:var(--white);border:var(--border);box-shadow:6px 6px 0px var(--black);border-radius:24px;display:flex;padding:8px;gap:8px;z-index:10}
+    .nav-item{flex:1;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:bold;border-radius:16px;cursor:pointer;background:transparent;border:2px solid transparent;transition:all 0.4s}
+    .nav-item.active{background:var(--black);color:var(--white);border:2px solid var(--black)}
+    #floating-disc{position:fixed;top:140px;left:16px;width:80px;height:80px;background:var(--white);border:var(--border);box-shadow:5px 5px 0px var(--black);border-radius:50%;z-index:20;display:flex;align-items:center;justify-content:center;cursor:grab;touch-action:none}
+    .disc-inner-cover{width:60px;height:60px;border-radius:50%;border:var(--border);object-fit:cover;background:var(--gray)}
+    .spin-anim{animation:spin 3s linear infinite;animation-play-state:paused}
+    .spin-anim.playing{animation-play-state:running}
+    @keyframes spin{100%{transform:rotate(360deg)}}
+    .disc-dot{position:absolute;bottom:-2px;right:-2px;width:20px;height:20px;border-radius:50%;border:var(--border);background:var(--dot-red);transition:all 0.4s}
+    .disc-dot.playing{background:var(--dot-green);box-shadow:0 0 12px var(--dot-green)}
+  </style>
+</head>
+<body>
+
+  <div id="intro-screen">
+    <div class="fingerprint-container" id="hold-area">
+      <img src="https://cdn-icons-png.flaticon.com/512/2522/2522110.png" class="fingerprint-img" alt="fingerprint">
+    </div>
+    <div class="progress-bar-container"><div id="progress-line"></div></div>
+    <div id="progress-text">0%</div>
+  </div>
+
+  <div id="app-screen">
+    <div class="content-area">
+      <div id="view-home" class="view active">
+        <input type="text" id="search-input" class="search-bar" placeholder="SEARCH RAIM LAODE / VIRGOUN / TULUS">
+        <div class="genres-wrapper" id="genre-container"></div>
+        <div id="home-list"></div>
+      </div>
+      <div id="view-playlist" class="view"><div id="playlist-list"></div></div>
+      <div id="view-setting" class="view">
+        <img src="https://files.catbox.moe/an7370.jpg" class="profile-img" alt="Profile">
+        <div class="profile-name">Alyz Spotify<div class="verified-tick">✓</div></div>
+        <div class="profile-detail">WHATSAPP<br><strong style="font-size:16px;">6283808394658</strong></div>
+        <div class="profile-detail">TIKTOK<br><strong style="font-size:16px;">@aizxstechu</strong></div>
+        <button class="btn-logout" id="btn-logout">LOGOUT</button>
+        <div class="api-guide"><b>CATATAN TUAN ALYZ</b><br>1. jika kamu ingin menambahkan lagu chat alyz<br>2. bantu follow akun tiktok dev<br>3. terimakasih sudah mendukung saya @alyz</div>
+      </div>
+    </div>
+    <div class="bottom-nav">
+      <div class="nav-item active" data-target="home">HOME</div>
+      <div class="nav-item" data-target="playlist">PLAYLIST</div>
+      <div class="nav-item" data-target="setting">SETTING</div>
+    </div>
+    <div id="floating-disc">
+      <img id="disc-cover" src="https://picsum.photos/seed/default/200" class="disc-inner-cover spin-anim" alt="disc">
+      <div id="disc-dot" class="disc-dot"></div>
+    </div>
+  </div>
+
+  <audio id="audio-player" playsinline preload="auto"></audio>
+
+  <script>
+    const SONGS = [
+      { id: 1, title: "Iqro'", artist: "Raim Laode", genre: "INDIE", cover: "https://files.catbox.moe/z0nc0b.jpeg", audio: "https://files.catbox.moe/6av5la.mp3", link: "https://open.spotify.com/search/Iqro%20Raim%20Laode" },
+      { id: 2, title: "Menari-Nari", artist: "Raim Laode", genre: "INDIE", cover: "https://files.catbox.moe/z0nc0b.jpeg", audio: "https://files.catbox.moe/cud2py.mp3", link: "https://open.spotify.com/search/Menari%20Raim%20Laode" },
+      { id: 3, title: "Surat Cinta Untuk Starla", artist: "Virgoun", genre: "POP", cover: "https://files.catbox.moe/v6jhwx.jpg", audio: "https://files.catbox.moe/75lh4u.mpeg", link: "https://open.spotify.com/search/Surat%20Cinta%20Untuk%20Starla%20Virgoun" },
+      { id: 4, title: "Dunia Yang Nanti", artist: "Raim Laode", genre: "FOLK", cover: "https://files.catbox.moe/z0nc0b.jpeg", audio: "https://files.catbox.moe/xq0y0w.mp3", link: "https://open.spotify.com/search/Dunia%20Yang%20Nanti%20Raim%20Laode" },
+      { id: 5, title: "Komang", artist: "Raim Laode", genre: "FOLK", cover: "https://files.catbox.moe/z0nc0b.jpeg", audio: "https://files.catbox.moe/pemgaq.mp3", link: "https://open.spotify.com/search/Komang%20Raim%20Laode" },
+      { id: 6, title: "Jatuh Suka", artist: "Tulus", genre: "POP", cover: "https://files.catbox.moe/75kt23.jpeg", audio: "https://files.catbox.moe/56eat2.mp3", link: "https://open.spotify.com/search/Jatuh%20Suka%20Tulus" },
+      { id: 7, title: "Terpikat Senyummu", artist: "IDGAF", genre: "POP", cover: "https://files.catbox.moe/8acpdk.jpeg", audio: "https://files.catbox.moe/hkvuhu.mp3", link: "https://open.spotify.com/search/Terpikat%20Senyummu" },
+    ];
+    const GENRES = ["ALL","INDIE","POP","FOLK"];
+    let isHolding=false, progress=0, animFrame, currentGenre="ALL", searchQuery="", currentSongId=null;
+
+    const introScreen=document.getElementById('intro-screen'), appScreen=document.getElementById('app-screen'), holdArea=document.getElementById('hold-area');
+    const progressLine=document.getElementById('progress-line'), progressText=document.getElementById('progress-text'), btnLogout=document.getElementById('btn-logout');
+    const searchInput=document.getElementById('search-input'), genreContainer=document.getElementById('genre-container'), homeList=document.getElementById('home-list'), playlistList=document.getElementById('playlist-list');
+    const navItems=document.querySelectorAll('.nav-item'), views=document.querySelectorAll('.view');
+    const audioPlayer=document.getElementById('audio-player'), floatingDisc=document.getElementById('floating-disc'), discCover=document.getElementById('disc-cover'), discDot=document.getElementById('disc-dot');
+
+    // === BACKGROUND AUDIO LOGIC ===
+    function updateMediaSession(song){
+      if('mediaSession' in navigator){
+        navigator.mediaSession.metadata = new MediaMetadata({
+          title: song.title,
+          artist: song.artist,
+          album: 'ALYZ SPOTIFY',
+          artwork: [{src: song.cover, sizes:'512x512', type:'image/jpeg'}]
+        });
+        navigator.mediaSession.setActionHandler('play', ()=>{ audioPlayer.play().catch(()=>{}) });
+        navigator.mediaSession.setActionHandler('pause', ()=> audioPlayer.pause());
+        navigator.mediaSession.setActionHandler('nexttrack', ()=>{
+          let idx=SONGS.findIndex(s=>s.id===currentSongId); idx=(idx+1)%SONGS.length; playSong(SONGS[idx].id);
+        });
+        navigator.mediaSession.setActionHandler('previoustrack', ()=>{
+          let idx=SONGS.findIndex(s=>s.id===currentSongId); idx=(idx-1+SONGS.length)%SONGS.length; playSong(SONGS[idx].id);
+        });
+      }
+    }
+
+    // INTRO HOLD
+    function startHold(e){ if(e) e.preventDefault(); isHolding=true; cancelAnimationFrame(animFrame); loopHold(); }
+    function endHold(){ isHolding=false; cancelAnimationFrame(animFrame); if(progress<100){progress=0; updateProgress();} }
+    function loopHold(){ if(!isHolding) return; progress+=1.5; if(progress>=100){progress=100; updateProgress(); triggerPremiumTransition(); return;} updateProgress(); animFrame=requestAnimationFrame(loopHold); }
+    function updateProgress(){ progressText.innerText=Math.floor(progress)+"%"; progressLine.style.width=progress+"%"; }
+    function triggerPremiumTransition(){ introScreen.classList.add('hide'); setTimeout(()=>{ introScreen.style.display='none'; appScreen.style.display='block'; setTimeout(()=>appScreen.classList.add('show'),50); if(!currentSongId) setInitialDiscCover(); },600); }
+    function logoutApp(){ audioPlayer.pause(); appScreen.classList.remove('show'); setTimeout(()=>{ appScreen.style.display='none'; introScreen.style.display='flex'; introScreen.classList.remove('hide'); progress=0; updateProgress(); },600); }
+
+    holdArea.addEventListener('mousedown', startHold); holdArea.addEventListener('touchstart', startHold, {passive:false});
+    document.addEventListener('mouseup', endHold); document.addEventListener('touchend', endHold);
+    btnLogout.addEventListener('click', logoutApp);
+
+    function init(){ renderGenres(); renderHome(); renderPlaylist(); }
+    function renderGenres(){ if(!genreContainer) return; genreContainer.innerHTML=''; GENRES.forEach(genre=>{ const chip=document.createElement('div'); chip.className=`genre-chip ${genre===currentGenre?'active':''}`; chip.innerText=genre; chip.onclick=()=>{ currentGenre=genre; renderGenres(); renderHome(); }; genreContainer.appendChild(chip); }); }
+    function getFilteredSongs(){ return SONGS.filter(song=>{ const matchGenre=currentGenre==="ALL"||song.genre===currentGenre; const matchSearch=song.title.toLowerCase().includes(searchQuery)||song.artist.toLowerCase().includes(searchQuery); return matchGenre&&matchSearch; }); }
+    function renderHome(){ if(!homeList) return; homeList.innerHTML=''; const filtered=getFilteredSongs(); if(filtered.length===0){homeList.innerHTML='<div style="text-align:center;padding:20px;font-size:12px;">TIDAK ADA LAGU</div>'; return;} filtered.forEach(song=>{ const isActive=currentSongId===song.id; const card=document.createElement('div'); card.className=`song-card ${isActive&&!audioPlayer.paused?'playing-active':''}`; card.onclick=()=>playSong(song.id); card.innerHTML=`<img src="${song.cover}" class="song-cover"><div class="song-info"><div class="song-title">${song.title}</div><div class="song-artist">${song.artist}</div></div><div class="badge">${song.genre}</div>`; homeList.appendChild(card); }); }
+    function renderPlaylist(){ if(!playlistList) return; playlistList.innerHTML=''; SONGS.forEach(song=>{ const isActive=currentSongId===song.id; const card=document.createElement('div'); card.className=`song-card ${isActive&&!audioPlayer.paused?'playing-active':''}`; card.innerHTML=`<img src="${song.cover}" class="song-cover" onclick="playSong(${song.id})"><div class="song-info" onclick="playSong(${song.id})"><div class="song-title">${song.title}</div><div class="song-artist">${song.artist}</div></div><a href="${song.link}" target="_blank" class="btn-open">OPEN</a>`; playlistList.appendChild(card); }); }
+    if(searchInput){ searchInput.addEventListener('input', (e)=>{ searchQuery=e.target.value.toLowerCase(); renderHome(); }); }
+    navItems.forEach(item=>{ item.addEventListener('click', ()=>{ navItems.forEach(n=>n.classList.remove('active')); item.classList.add('active'); views.forEach(v=>{ v.style.animation='none'; v.classList.remove('active'); void v.offsetWidth; }); const target=item.getAttribute('data-target'); const activeView=document.getElementById(`view-${target}`); activeView.style.animation='fadeSlideUp 0.4s cubic-bezier(0.16,1,0.3,1) forwards'; activeView.classList.add('active'); }); });
+    function setInitialDiscCover(){ if(SONGS.length>0) discCover.src=SONGS[0].cover; }
+
+    function playSong(id){
+      const song=SONGS.find(s=>s.id===id); if(!song) return;
+      if(currentSongId===id){ togglePlayPause(); return; }
+      currentSongId=id; audioPlayer.src=song.audio; discCover.src=song.cover;
+      audioPlayer.play().then(()=>{ updateMediaSession(song); }).catch(()=>{});
+    }
+    function togglePlayPause(){
+      if(!currentSongId){ if(SONGS.length>0) playSong(SONGS[0].id); return; }
+      if(audioPlayer.paused){ audioPlayer.play().catch(()=>{}); } else { audioPlayer.pause(); }
+    }
+
+    audioPlayer.onplay=()=>{ discCover.classList.add('playing'); discDot.classList.add('playing'); renderHome(); renderPlaylist(); if('mediaSession' in navigator) navigator.mediaSession.playbackState='playing'; };
+    audioPlayer.onpause=()=>{ discCover.classList.remove('playing'); discDot.classList.remove('playing'); renderHome(); renderPlaylist(); if('mediaSession' in navigator) navigator.mediaSession.playbackState='paused'; };
+    audioPlayer.onended=()=>{ let idx=SONGS.findIndex(s=>s.id===currentSongId); idx=(idx+1)%SONGS.length; playSong(SONGS[idx].id); };
+
+    // Biar gak ke-pause pas pindah app
+    document.addEventListener('visibilitychange', ()=>{
+      if(document.visibilityState==='visible' && currentSongId && discDot.classList.contains('playing')){
+        // kalau user balik, pastikan tetap playing
+        if(audioPlayer.paused){
+          // jangan auto play kalau memang user yang pause, cek dot aja
+        }
+      }
+    });
+
+    // Floating disc drag
+    let dragMoved=false, startX, startY, startLeft, startTop;
+    function getPointerEvent(e){ return e.type.includes('touch') ? e.touches[0] : e; }
+    if(floatingDisc){ floatingDisc.addEventListener('mousedown', dragStart); floatingDisc.addEventListener('touchstart', dragStart, {passive:false}); }
+    function dragStart(e){ const evt=getPointerEvent(e); startX=evt.clientX; startY=evt.clientY; const style=window.getComputedStyle(floatingDisc); startLeft=parseInt(style.left,10); startTop=parseInt(style.top,10); dragMoved=false; document.addEventListener('mousemove', dragMove); document.addEventListener('mouseup', dragEnd); document.addEventListener('touchmove', dragMove, {passive:false}); document.addEventListener('touchend', dragEnd); }
+    function dragMove(e){ const evt=getPointerEvent(e); const dx=evt.clientX-startX; const dy=evt.clientY-startY; if(Math.abs(dx)>4||Math.abs(dy)>4){dragMoved=true; e.preventDefault();} if(dragMoved){ let newLeft=startLeft+dx; let newTop=startTop+dy; const maxLeft=window.innerWidth-80-10; const maxTop=window.innerHeight-80-100; newLeft=Math.max(10,Math.min(newLeft,maxLeft)); newTop=Math.max(10,Math.min(newTop,maxTop)); floatingDisc.style.left=newLeft+'px'; floatingDisc.style.top=newTop+'px'; } }
+    function dragEnd(){ document.removeEventListener('mousemove', dragMove); document.removeEventListener('mouseup', dragEnd); document.removeEventListener('touchmove', dragMove); document.removeEventListener('touchend', dragEnd); if(!dragMoved){ togglePlayPause(); } }
+
+    init();
+  </script>
+</body>
+</html>
